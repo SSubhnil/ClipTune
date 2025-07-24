@@ -2,7 +2,7 @@
 dataset:
   family: atari                   # one of: atari | procgen | mujoco | dm_control
   id: atari/krull/expert-v0       # full Minari ID
-  n_ctx: 3                        # frames in the temporal window
+  n_ctx: 4                        # frames in the temporal window
 
 # ---------------- model ------------------
 model:
@@ -13,10 +13,10 @@ model:
 
 # ---------------- training ---------------
 training:
-  epochs: 5
+  epochs: 12
   batch: 256
   lr: 1.0e-4
-  unfreeze: 1                     # last ViT blocks to fine-tune
+  unfreeze: 2                     # last ViT blocks to fine-tune
   temperature: 0.07
 
 # ---------------- output -----------------

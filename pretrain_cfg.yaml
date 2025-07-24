@@ -5,11 +5,14 @@ model:
   dec_hlat: 256      # Hidden channels inside decoder
   proj_dim: 128      # Projector dim for InfoNCE
 
+dataset:
+  n_ctx: 4           # number of successive frames (anchor/pos/neg)
+
 training:
-  epochs: 5
+  epochs: 12
   batch: 256
-  lr: 1e-4
-  unfreeze: 1        # last ViT block fine-tuned
+  lr: 1.0e-4
+  unfreeze: 2        # last ViT block fine-tuned
   temperature: 0.07
 
 output:

@@ -120,16 +120,34 @@ def main(cfg, dataset_id: str, save_prefix: str | None):
 
     params = (list(proj.parameters()) + list(dec.parameters()) +
               [p for p in vision.parameters() if p.requires_grad])
-    opt = torch.optim.AdamW(params, lr=cfg.training.lr, weight_decay=1e-4)
+    lr_val = float(cfg.training.lr)          # ← ensures a true float
+    opt = torch.optim.AdamW(params, lr=lr_val, weight_decay=1e-4)
 
-    # --- helper: CLIP → 1,024-D latent --------------------------------
+    # --- helper: CLIP → 1,024-D latent ---------------------------------
+    @torch.no_grad()
     def clip_encode(imgs: torch.Tensor) -> torch.Tensor:
-        # CLS token (512 D)
-        cls_vec = vision(imgs)  # (B,512)
-        # Patch tokens pooled + trim to 512 D for simplicity
-        patch_tokens = vision.patch_embed(imgs)            # (B,N,768)
-        patch_mean   = patch_tokens.mean(1)[:, :512]       # (B,512)
-        return torch.cat([cls_vec, patch_mean], dim=-1)    # (B,1024)
+        # global CLS embedding (512 D)
+        cls_vec = vision(imgs)                         # (B,512)
+
+        # ---------------------------------------------------------------
+        # obtain patch tokens, no matter which API the backbone exposes
+        # ---------------------------------------------------------------
+        if hasattr(vision, "patch_embed"):             # most LAION models
+            patches = vision.patch_embed(imgs)         # (B,N,768)
+        elif hasattr(vision, "trunk") and hasattr(vision.trunk, "patch_embed"):
+            patches = vision.trunk.patch_embed(imgs)   # EVA / SigLIP-2
+        elif hasattr(vision, "conv1"):                 # OpenAI original weights
+            # conv1 → (B,C,H,W) → (B,N,C)
+            patches = vision.conv1(imgs)
+            patches = patches.reshape(patches.size(0), patches.size(1), -1)
+            patches = patches.permute(0, 2, 1)         # (B,N,768)
+        else:
+            raise RuntimeError("No patch-embedding layer found")
+
+        patch_mean = patches.mean(1)[:, :512]          # (B,512)
+        return torch.cat([cls_vec, patch_mean], dim=-1)  # (B,1024)
+
+
 
     for ep in range(cfg.training.epochs):
         bar = tqdm(loader, desc=f"epoch {ep+1}/{cfg.training.epochs}")
