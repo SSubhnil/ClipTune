@@ -1,0 +1,9 @@
+Game	Mode values	Difficulty values	Why it stresses generalisation
+Adventure	0 / 1 / 2	0 / 1 / 2 / 3	Each flavour changes maze layout and object locations, so the agent must learn abstract navigation, not wall-by-wall memorisation.
+Alien	0 – 3	0 – 3	Alters alien speed patterns and firing frequency; good for assessing robustness to timing changes.
+Breakout	0, 4, 8, … 44 (12 modes)	0 / 1	Higher modes start with complex brick walls or invisible bricks; difficulties modify ball acceleration—targets visual and dynamics shifts simultaneously.
+Freeway	0 – 7	0 / 1	Changes traffic density and lane speed; common test-bed for “long-tail” behaviours such as rare fast cars.
+Space Invaders	0 – 15	0 / 1	Different starting formations, shields and UFO frequency; forces policies to cope with unseen enemy layouts.
+Space War	6 – 17	0	Each mode re-positions gravity sources and planet obstacles, stressing causal modelling of projectile trajectories.
+Air Raid	1 – 8	0	Rarely used but offers eight distinct wave patterns with identical sprites—useful for representation robustness.
+Hero	0 – 4	0	Distinct cave topologies per mode; emphasises transfer of exploration heuristics rather than pixel cues.

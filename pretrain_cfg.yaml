@@ -1,0 +1,16 @@
+# ---------- global ----------
+model:
+  img_res: 64        # Decoder output size H=W=64
+  enc_out: 1024      # Latent size expected by Drama
+  dec_hlat: 256      # Hidden channels inside decoder
+  proj_dim: 128      # Projector dim for InfoNCE
+
+training:
+  epochs: 5
+  batch: 256
+  lr: 1e-4
+  unfreeze: 1        # last ViT block fine-tuned
+  temperature: 0.07
+
+output:
+  base_dir: checkpoints
